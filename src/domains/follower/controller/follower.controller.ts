@@ -12,12 +12,6 @@ export const followerRouter = Router();
 // Use dependency injection
 const service: FollowerService = new FollowerServiceImpl(new FollowerRepositoryImpl(db));
 
-followerRouter.get('/follow/:id', function (req, res) {
-    const { userId } = res.locals.context;
-    // userId del logeado se obtiene del token
-    // userId del usuario a seguir necesito obtener
-  })
-
 followerRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context;
   console.log({userId});
