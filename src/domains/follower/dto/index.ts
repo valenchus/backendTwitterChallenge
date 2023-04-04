@@ -12,19 +12,6 @@ export class FollowerDTO {
     followedId: string | null;
     createdAt: Date;
   }
-  
-  // export class ExtendedFollowerDTO extends FollowerDTO {
-  
-  //   constructor(follower: ExtendedFollowerDTO) {
-  //     super(follower)
-  //     // this.email = follower.email;
-  //     // this.name = follower.name;
-  //     // this.password = follower.password;
-  //   }
-  
-  //   email!: string;
-  //   username!: string;
-  //   password!: string;
-  // }
+
   
   
