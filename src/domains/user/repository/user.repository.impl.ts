@@ -1,4 +1,7 @@
 import { SignupInputDTO } from '@domains/auth/dto';
+import { CommentDTO } from '@domains/comment/dto';
+import { PostDTO } from '@domains/post/dto';
+import { ReactionDTO } from '@domains/reaction/dto';
 import { PrismaClient } from '@prisma/client';
 import { OffsetPagination } from '@types';
 import { ExtendedUserDTO, UserDTO } from '../dto';
@@ -8,9 +11,47 @@ export class UserRepositoryImpl implements UserRepository {
   constructor(private readonly db: PrismaClient) {}
 
   async create(data: SignupInputDTO): Promise<UserDTO> {
-    return await this.db.user.create({
+    const user = await this.db.user.create({
       data,
-    }).then(user => new UserDTO(user));
+    });
+    const generateUrl = `https://valenbucket7test.s3.amazonaws.com/s3-images/${user.id}.jpeg`;
+    await this.db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        imageProfile: generateUrl,
+      },
+    });
+    return new UserDTO(user);
+  }
+
+  async tweetsLikedByUser(userId: string): Promise<ReactionDTO[] | null> {
+    const tweets = await this.db.reaction.findMany({
+      where: {
+        userId: userId,
+        type: 'like',
+      },
+    });
+    return tweets.map((tweet) => new ReactionDTO(tweet));
+  }
+  async retweetsByUser(userId: string): Promise<ReactionDTO[] | null> {
+    const tweets = await this.db.reaction.findMany({
+      where: {
+        userId: userId,
+        type: 'retweet',
+      },
+    });
+    // return tweets ? tweets.map((tweet) => new ReactionDTO(tweet)) : null;
+    return tweets.map((tweet) => new ReactionDTO(tweet));
+  }
+  async commentsByUser(userId: string): Promise<CommentDTO[] | null> {
+    const comments = await this.db.comment.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+    return comments ? comments.map((comment) => new CommentDTO(comment)) : null;
   }
 
   async getById(userId: any): Promise<UserDTO | null> {
@@ -40,7 +81,7 @@ export class UserRepositoryImpl implements UserRepository {
         },
       ],
     });
-    return users.map(user => new UserDTO(user));
+    return users.map((user) => new UserDTO(user));
   }
 
   async getByEmailOrUsername(email?: string, username?: string): Promise<ExtendedUserDTO | null> {
@@ -74,10 +115,8 @@ export class UserRepositoryImpl implements UserRepository {
       },
       data: {
         isPrivate: isPrivate,
-      }
-    })
+      },
+    });
     return new UserDTO(user);
   }
-  
 }
-

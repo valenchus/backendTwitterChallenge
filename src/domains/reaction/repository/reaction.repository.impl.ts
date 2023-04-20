@@ -1,27 +1,19 @@
-import { ReactionDTO } from "../dto";
+import { PrismaClient } from '@prisma/client';
+import { ReactionDTO } from '../dto';
+import { ReactionRepository } from './reaction.repository';
 
 export class ReactionRepositoryImpl implements ReactionRepository {
-    constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: PrismaClient) {}
 
-    async create(userId: string, postId: string, type: string): Promise<ReactionDTO> {
-        const post = await this.db.reaction.create({
-            data: {
-                userId,
-                postId,
-                reaction: type
-            },
-        });
-        return new ReactionDTO(post)
-    }
+  async createReactionPost(userId: string, postId: string, type: string): Promise<ReactionDTO> {
+    const reaction = await this.db.reaction.create({
+      data: {
+        postId,
+        userId,
+        type,
+      },
+    });
 
-    async delete(postId: string, type: string): Promise<void> {
-        await this.db.reaction.deleteMany({
-            where: {
-                postId: postId,
-                AND: {
-                    reaction: type,
-                },
-            }
-        })
-    }
+    return new ReactionDTO(reaction);
+  }
 }

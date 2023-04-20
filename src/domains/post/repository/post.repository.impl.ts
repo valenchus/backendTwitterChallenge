@@ -92,25 +92,25 @@ export class PostRepositoryImpl implements PostRepository {
     return user ? new UserDTO(user) : null;
   }
   
-  async canSeePosts(followerId: string, followedId: string): Promise<Boolean> {
-    const isAPublicUser = await this.db.user.findUnique({
+  async canSeePosts(followerId: string, followedId: string): Promise<boolean> {
+    const user = await this.db.user.findUnique({
       where: {
-        id: followedId
+        id: followedId,
       }
-    });
-    console.log("hola1");
-    console.log(isAPublicUser);
-    if (isAPublicUser?.isPrivate === true) {
-      const isFollower = await this.db.follow.findMany({
+    })
+    if (user?.isPrivate === false) {
+      // El campo isPrivate es false
+      return true;
+    } else {
+      const isBeingFollowed = await this.db.follow.findFirst({
         where: {
-          followedId,
-          AND: {
-            followerId
-          }
+          followerId,
+          followedId: user?.id
         }
-      });
-      if (isFollower.length < 1) return false;
+      })
+      if (isBeingFollowed) return true;
     }
-    return true;  
+    return false;
   }
+  
 }

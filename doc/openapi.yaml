@@ -1,0 +1,388 @@
+openapi: 3.0.0
+info:
+  title: Ejemplo de API de usuarios
+  description: API que proporciona información de usuarios
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the user
+        username:
+          type: string
+          description: Username of the user
+        name:
+          type: string
+          description: Name of the user
+        email:
+          type: string
+          description: Email of the user
+        password:
+          type: string
+          description: Encrypted password of the user
+        createdAt:
+          type: string
+          description: User creation date
+        updatedAt:
+          type: string
+          description: User update date
+        deletedAt:
+          type: string
+          description: User delete date
+        isPrivate:
+          type: boolean
+          description: Indicates if the user has a public or private profile
+        imageProfile:
+          type: string
+          description: URL of the image
+      example:
+        id: 1
+        username: 'lio10'
+        name: 'Lionel Messi'
+        email: 'liomessi@gmail.com'
+        password: '********'
+        createdAt: '12/04/2023'
+        updatedAt: '-'
+        deletedAt: '-'
+        isPrivate: f
+        imageProfile: 'https://valenbucket7test.s3.amazonaws.com/s3-images/09754064-3c25-49d9-a85d-f353f51fb0bd.jpeg'
+    Post:
+      type: object
+      properties:
+        authorId:
+          type: string
+          description: Unique identifier of the post
+        content:
+          type: string
+          description: Content from the post
+        images:
+          type: array
+          description: Images of the post
+        createdAt:
+          type: date
+          description: Post created date
+        parentPost:
+          type?: string
+          description: If its a comment from a post, this value exist. It reflects the original post ID
+      example:
+        authorId: '0ddd6a55-00b6-4a61-ad5f-cd5574452fcc	'
+        content: 'Este es un posteo'
+        images: ['URL']
+        createdAt: '2023-04-11T18:24:22.397Z'
+        parentPost: null
+    Reaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier from the reaction
+        type:
+          type: string
+          description: Reaction type, it can be like or retweet
+        userId:
+          type: string
+          description: Unique identifier from the user that's reaction to a post
+        postId:
+          type: string
+          description: ID from the post that's being reacted
+        createdAt:
+          type: date
+          description: Reaction created date
+        updatedAt:
+          type: date
+          description: Reaction updated date
+        deletedAt:
+          type: date
+          description: Reaction deleted date
+paths:
+  /api/health:
+    get:
+      summary: Estado de la API
+      responses:
+        '200':
+          description: OK
+      tags:
+        - API health
+  /api/auth/signup:
+    post:
+      summary: Registrar un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: integer
+      tags:
+        - AUTH
+  /api/auth/login:
+    post:
+      summary: Iniciar sesion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+      security:
+        - BearerAuth: []
+      tags:
+        - AUTH
+  /api/follower/follow/{user_id}:
+    post:
+      summary: Follow a user
+      security:
+        - bearerAuth: []
+      description: Creates a new follower relationship between the authenticated user and the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user to follow.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the follower relationship.
+                  followerId:
+                    type: string
+                    description: The ID of the follower user.
+                  followedId:
+                    type: string
+                    description: The ID of the followed user.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time the follower relationship was created.
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time the follower relationship was last updated.
+                  deletedAt:
+                    type: null
+                    description: The follower relationship has not been deleted.
+              example:
+                id: '1234'
+                followerId: '5678'
+                followedId: '9012'
+                createdAt: '2023-04-09T13:00:00Z'
+                updatedAt: '2023-04-09T13:00:00Z'
+                deletedAt: null
+      tags:
+        - FOLLOWER
+  /api/follower/unfollow/{user_id}:
+    post:
+      summary: Unfollow a user
+      security:
+        - bearerAuth: []
+      description: Deletes the follower relationship between the authenticated user and the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user to unfollow.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the follower relationship.
+                  followerId:
+                    type: string
+                    description: The ID of the follower user.
+                  followedId:
+                    type: string
+                    description: The ID of the followed user.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time the follower relationship was created.
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time the follower relationship unfollow was last updated.
+                  deletedAt:
+                    type: null
+                    description: The follower relationship has been deleted.
+              example:
+                id: '1234'
+                followerId: '5678'
+                followedId: '9012'
+                createdAt: '2023-04-09T13:00:00Z'
+                updatedAt: '2023-04-09T13:00:00Z'
+                deletedAt: null
+      tags:
+        - FOLLOWER
+  /api/post:
+    get:
+      summary: Get all the posts
+      security:
+        - bearerAuth: []
+      description: Return the posts that the user is able to see
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json[]:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Post'
+      tags:
+        - POST
+  /api/post/by_user/{user_id}:
+    get:
+      summary: Get all the posts from a specific user
+      security:
+        - bearerAuth: []
+      description: Return all the posts from the user ID
+      parameters:
+        - name: user_id
+          in: path
+          description: The ID of the user we want to get the posts from
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+      tags:
+        - POST
+  /api/reaction/{post_id}:
+    post:
+      summary: Create a reaction to a post
+      security:
+        - bearerAuth: []
+      description: A reaction can be a like or retweet
+      parameters:
+        - postID: post_id
+          in: path
+          description: The ID of the post that we'll react to
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: string
+          description: The type of reaction, it can be like or retweet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Reaction'
+      tags:
+        - REACTION
+    delete:
+      summary: Delete a reaction to a post
+      security:
+        - bearerAuth: []
+      description: A reaction can be a like or retweet
+      parameters:
+        - postID: post_id
+          in: path
+          description: The ID of the post that we'll delete the reaction to
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Reaction'
+      tags:
+        - REACTION
+  /api/user/setPrivacy:
+    put:
+      summary: Change the privacy settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isPrivate:
+                  type: boolean
+                  description: The boolean value that specifies if the user has a public or private account
+      description: Change the account privacy settings to make private/public your profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#components/schemas/User'
+      tags:
+        - PRIVACY SETTINGS

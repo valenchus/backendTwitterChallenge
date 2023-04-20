@@ -17,9 +17,6 @@ const service: CommentService = new CommentServiceImpl(new CommentRepositoryImpl
     const { userId } = res.locals.context;
     const { postId } = req.params;
     const { content } = req.body;
-    console.log(userId);
-    console.log(postId);
-    console.log(content);
     await service.createComment(userId, postId, content);
     return res.status(200).json({
         message: "COMMENT CREATED!"

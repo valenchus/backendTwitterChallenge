@@ -27,6 +27,14 @@ followerRouter.post('/follow/:user_id', async (req: Request, res: Response) => {
         message: "user followed"
     });
 } )
+followerRouter.post('/unfollow/:user_id', async (req: Request, res: Response) => {
+  const { userId } = res.locals.context;
+  const { user_id } = req.params;
+  await service.unFollowUser(userId, user_id);
+  return res.status(200).json({
+    message: "user unfollowed"
+  });
+});
 
 
 followerRouter.delete('/', async (req: Request, res: Response) => {

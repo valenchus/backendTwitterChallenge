@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 export class AuthServiceImpl implements AuthService {
   constructor(private readonly repository: UserRepository) {}
 
-  async signup(data: SignupInputDTO): Promise<TokenDTO> {
+  async signup(data: SignupInputDTO): Promise<any> {
     const existingUser = await this.repository.getByEmailOrUsername(data.email, data.username);
     if (existingUser) throw new ConflictException('USER_ALREADY_EXISTS');
 
@@ -17,7 +17,7 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.repository.create({ ...data, password: encryptedPassword});
     const token = generateAccessToken({ userId: user.id });
 
-    return { token } as TokenDTO;
+    return { token, user };
   }
 
   async login(data: LoginInputDTO): Promise<TokenDTO> {

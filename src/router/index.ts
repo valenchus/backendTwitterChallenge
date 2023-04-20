@@ -6,7 +6,8 @@ import { postRouter } from '@domains/post';
 import { authRouter } from '@domains/auth';
 import { healthRouter } from '@domains/health';
 import {followerRouter} from "@domains/follower/controller/follower.controller";
-import { commentRouter } from '@domains/comments/controller/comment.controller';
+import { commentRouter } from '@domains/comment/controller/comment.controller';
+import { reactionRouter } from '@domains/reaction/controller/reaction.controller';
 
 export const router = Router();
 
@@ -16,3 +17,4 @@ router.use('/comments', withAuth, commentRouter);
 router.use('/user', withAuth, userRouter);
 router.use('/post', withAuth, postRouter);
 router.use('/follower', withAuth,followerRouter);
+router.use('/reaction', withAuth, reactionRouter);

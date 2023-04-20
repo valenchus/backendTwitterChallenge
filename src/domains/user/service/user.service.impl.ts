@@ -1,3 +1,6 @@
+import { CommentDTO } from '@domains/comment/dto';
+import { PostDTO } from '@domains/post/dto';
+import { ReactionDTO } from '@domains/reaction/dto';
 import { NotFoundException } from '@utils/errors';
 import { OffsetPagination } from 'types';
 import { UserDTO } from '../dto';
@@ -24,5 +27,13 @@ export class UserServiceImpl implements UserService {
   setPrivacySettings(userId: string, isPrivate: boolean): Promise<UserDTO> | null{
     return this.repository.setPrivacySettings(userId,isPrivate);
   }
-  
+  tweetsLikedByUser(userId: string): Promise<ReactionDTO[] | null> {
+    return this.repository.tweetsLikedByUser(userId);
+  }
+  retweetsByUser(userId: string): Promise<ReactionDTO[] | null> {
+    return this.repository.retweetsByUser(userId);
+  }
+  commentsByUser(userId: string): Promise<CommentDTO[] | null> {
+    return this.repository.commentsByUser(userId);
+  }
 }

@@ -5,6 +5,7 @@ export class UserDTO {
     this.name = user.name;
     this.createdAt = user.createdAt;
     this.isPrivate = user.isPrivate;
+    this.imageProfile = user.imageProfile;
 
   }
 
@@ -12,6 +13,7 @@ export class UserDTO {
   name: string | null;
   createdAt: Date;
   isPrivate?: boolean | null;
+  imageProfile?: string | null;
 }
 
 export class ExtendedUserDTO extends UserDTO {

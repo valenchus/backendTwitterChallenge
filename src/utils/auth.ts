@@ -15,12 +15,13 @@ export const withAuth = (req: Request, res: Response, next: () => any) => {
   const [bearer, token] = (req.headers.authorization as string | undefined)?.split(' ') || [];
 
   // Verify that the Authorization header has the expected shape
+  console.log(req.headers.authorization);
   if (!bearer || !token || bearer !== 'Bearer') throw new UnauthorizedException('MISSING_TOKEN');
 
   // Verify that the token is valid
   jwt.verify(token, Constants.TOKEN_SECRET, (err, context) => {
     if (err) throw new UnauthorizedException('INVALID_TOKEN');
-    res.locals.context = context;
+    res.locals.context = context; //jwt decoded
     next();
   });
 };

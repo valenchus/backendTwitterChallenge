@@ -21,27 +21,42 @@ export class PostServiceImpl implements PostService {
     return this.repository.delete(postId);
   }
 
-  async getPost(userId: string, postId: string): Promise<PostDTO> {
+  async getPost(userId: string, postId: string): Promise<PostDTO | null> {
     // TODO: validate that the author has public profile or the user follows the author
     const post = await this.repository.getById(postId, userId);
     if (!post) throw new NotFoundException('post');
-    return post;
+    const userCanSee = await this.canSeePosts(userId, post.authorId);
+    if (userCanSee) return post;
+    return null;
   }
 
-  getLatestPosts(userId: string, options: CursorPagination): Promise<PostDTO[]> {
-    // TODO: filter post search to return posts from authors that the user follows
-    return this.repository.getAllByDatePaginated(userId, options);
+  async getLatestPosts(userId: string, options: CursorPagination, authorId?: string): Promise<PostDTO[] | null> {
+    const posts = await this.repository.getAllByDatePaginated(userId, options);
+    const filteredPosts = await Promise.all(
+      posts.map(async (post) => {
+        const canSeePost = await this.canSeePosts(userId, post.authorId);
+        if (canSeePost) {
+          return new PostDTO(post);
+        }
+        return null;
+      })
+    );
+    if (authorId !== undefined) {
+      return filteredPosts.filter((post) => post?.authorId === authorId) as PostDTO[];
+    }
+    return filteredPosts.filter((post) => post !== null) as PostDTO[];
   }
 
-  getPostsByAuthor(userId: any, authorId: string, options: CursorPagination): Promise<PostDTO[]> {
+  async getPostsByAuthor(userId: any, authorId: string, options: CursorPagination): Promise<PostDTO[]> {
     // TODO: throw exception when the author has a private profile and the user doesn't follow them
+    const canSeePost = await this.canSeePosts(userId, authorId);
+    if (!canSeePost) throw new NotFoundException();
     return this.repository.getByAuthorId(userId, authorId, options);
   }
   getUserById(userId: any): Promise<UserDTO | null> {
     return this.repository.getUserById(userId);
   }
   canSeePosts(followerId: string, followedId: string): Promise<Boolean> {
-    return this.repository.canSeePosts(followerId, followedId)
+    return this.repository.canSeePosts(followerId, followedId);
   }
-
 }

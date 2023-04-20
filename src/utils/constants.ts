@@ -28,4 +28,9 @@ export class Constants {
 
   // Authentication secret
   static TOKEN_SECRET: string = process.env.TOKEN_SECRET || 'secret';
+
+  // AWS
+  static S3_ACCESS_KEY_ID: string = process.env.S3_ACCESS_KEY_ID || '';
+  static S3_SECRET_ACCESS_KEY_ID: string = process.env.S3_SECRET_ACCESS_KEY_ID || '';
+
 }

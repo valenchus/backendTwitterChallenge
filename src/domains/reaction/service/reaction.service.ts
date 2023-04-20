@@ -1,4 +1,5 @@
+import { ReactionDTO } from "../dto";
+
 export interface ReactionService {
-      create(followerId: String, followedId: String, type: String): Promise<void>;
-      delete(postId: String, type: String): Promise<void>;
-    }
+  createReactionPost(userId: string, postId: string, type: string): Promise<void>;
+}

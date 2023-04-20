@@ -2,14 +2,14 @@ export class ReactionDTO {
     id: string;
     userId: string;
     postId: string;
-    reaction: string;
+    type: string;
     createdAt: Date;
   
     constructor(reaction: ReactionDTO) {
       this.id = reaction.id;
       this.userId = reaction.userId;
       this.postId = reaction.postId;
-      this.reaction = reaction.reaction;
+      this.type = reaction.type;
       this.createdAt = reaction.createdAt;
     }
   }
