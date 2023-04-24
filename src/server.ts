@@ -5,8 +5,15 @@ import cors from 'cors';
 import { Constants, NodeEnv, Logger } from '@utils';
 import { router } from '@router';
 import { ErrorHandling } from '@utils/errors';
+import { Server } from 'http';
+import http from 'http';
+import { createServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 
- const app = express();
+const app = express();
+
+// crear el servidor http
+const server = createServer(app);
 
 // Set up request logger
 if (Constants.NODE_ENV === NodeEnv.DEV) {
@@ -29,7 +36,28 @@ app.use('/api', router);
 
 app.use(ErrorHandling);
 
-app.listen(Constants.PORT, () => {
+// chat
+const io = new SocketServer(server);
+
+io.on('connection', (socket) => {
+  console.log(`Un nuevo cliente se ha conectado con el ID: ${socket.id}`);
+
+  // Maneja los mensajes enviados por el cliente
+  socket.on('chat:message', (message) => {
+    console.log(`Mensaje recibido del cliente con ID ${socket.id}: ${message}`);
+
+    // Reenvía el mensaje a todos los clientes conectados
+    socket.emit('chat:message', `hola esto es un ${message}`);
+  });
+
+  // desconexión del cliente
+  socket.on('disconnect', () => {
+    console.log(`El cliente con ID ${socket.id} se ha desconectado`);
+  });
+});
+
+server.listen(Constants.PORT, () => {
   Logger.info(`Server listening on port ${Constants.PORT}`);
 });
+
 export default app;
